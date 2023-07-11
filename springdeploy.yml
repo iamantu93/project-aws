@@ -4,8 +4,6 @@ kind: Deployment
 metadata:
   name: spring-deployment-service
 spec:
-  dependsOn:
-    - mysql-deployment
   replicas: 1
   selector:
     matchLabels:

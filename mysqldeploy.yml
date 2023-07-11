@@ -1,0 +1,45 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-deployment
+  labels:
+    app: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:latest
+        env:
+        - name: MYSQL_DATABASE
+          value: "sparklmsdb"  # Corrected: Enclosed in quotes as a string
+        - name: MYSQL_ROOT_PASSWORD
+          value: "antu1234"  # Corrected: Enclosed in quotes as a string
+        - name: MYSQL_USER
+          value: "antu"
+        - name: MYSQL_PASSWORD
+          value: "antu1234"
+        ports:
+        - containerPort: 3306
+          name: mysql
+          
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+spec:
+  selector:
+    app: mysql
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306

@@ -11,4 +11,4 @@ COPY target/spark-lms-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8080
 
 # Set the command to run the Spring Boot application when the container starts
-CMD ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

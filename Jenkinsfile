@@ -7,8 +7,7 @@ parameters {
     }
     environment {
         BRANCH = "master"
-        GIT_REPO = "https://github.com/iamantu93/project.git"
-        DOCKER_REGISTRY = "iamantu93/project"
+        GIT_REPO = "https://github.com/iamantu93/project-aws.git"
     }
     
     triggers {
@@ -30,18 +29,12 @@ stages {
     stage('Build stage') {
         steps {
             script {
-                sh 'mvn clean package'
                 echo 'This is build stage'
-                customImage=docker.build("${env.DOCKER_REGISTRY}")
-                customImage.push("${env.BUILD_ID}")
+                sh 'mvn clean package -X'
             }
         } 
     }
-    stage('Clean Up') {
-        steps {
-            sh "docker rmi -f ${env.DOCKER_REGISTRY}:${env.BUILD_ID}"
-        }
-    }
+
     stage('Test stage') {
         steps {
             echo 'This is Test stage'
@@ -51,13 +44,13 @@ stages {
     stage('Deploy stage') {
         steps {
             echo 'This is deploy stage'
-            script {
-               kubeconfig(credentialsId: 'kubeconf' ) {
-                    sh "sed -i 's/TAG/${env.BUILD_ID}/g' kubernetesdeploy/springdeploy.yml" 
-                    sh "/usr/bin/kubectl apply -f kubernetesdeploy/mysqldeploy.yml"
-                    sh "/usr/bin/kubectl apply -f kubernetesdeploy/springdeploy.yml"
+            script{
+                sshagent(['EC2']) {
+                    sh 'scp -o StrictHostKeyChecking=no target/spark-lms-0.0.1-SNAPSHOT.jar ec2-user@54.244.201.42:/home/ec2-user'
+                    sh "ssh -o StrictHostKeyChecking=no ec2-user@54.244.201.42 'start' "
                 }
             }
+            
         } 
     }
     
